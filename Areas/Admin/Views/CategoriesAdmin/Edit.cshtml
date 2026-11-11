@@ -1,0 +1,81 @@
+﻿@model MusicStore.Models.Category
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+
+@using (Html.BeginForm("Edit", "CategoriesAdmin", new { area = "Admin" }, FormMethod.Post, new { enctype = "multipart/form-data", id = "frmCategoriesEdit" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Category</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.CategoryId)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CategoryName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.CategoryName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.CategoryName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="button" value="Save" name="btSave" id="btSave" class="btn btn-primary" /> |
+                @Html.ActionLink("Back to list", "Index")
+            </div>
+        </div>
+    </div>
+}
+
+<div id="msg" style="color:blue"></div>
+
+@section Scripts{
+    <script>
+        $("#btSave").click(function (e) {
+            e.preventDefault();
+            var form = document.getElementById("frmCategoriesEdit");
+            var formData = new FormData(form);
+            $.ajax({
+                url: '@Url.Action("Edit","CategoriesAdmin", new { area = "Admin" })',
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(res){
+                    if(res.result){
+                        $("#msg").html("Update successfully");
+                    }
+                    else{
+                        $("#msg").html(res.error);
+                    }
+                },
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                    $("#msg").html(xhr.responseText);
+                }
+            });
+        });
+    </script>
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<script>
+    var loadFile = function (event) {
+        var image = document.getElementById('output');
+        image.src = URL.createObjectURL(event.target.files[0]);
+    };
+</script>

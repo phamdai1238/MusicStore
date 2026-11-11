@@ -1,0 +1,53 @@
+﻿@model MusicStore.Models.User
+
+@{
+    ViewBag.Title = "Register";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow border-0">
+                <div class="card-body p-4">
+                    <h2 class="text-center mb-4 fw-bold text-success">Create your account</h2>
+
+                    @using (Html.BeginForm("Register", "Users", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger small" })
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">User name</label>
+                            @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", placeholder = "Enter your username...", required = "required" })
+                            @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Password</label>
+                            @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Enter your password...", required = "required" })
+                            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Full name</label>
+                            @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", placeholder = "Nguyen Van A...", required = "required" })
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Phone number</label>
+                            @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", placeholder = "09xx...", required = "required" })
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 py-2 fw-bold text-uppercase">Sign up</button>
+                    }
+
+                    <div class="text-center mt-3 small">
+                        Already have an account? <a href="@Url.Action("Login", "Users")" class="text-decoration-none">Sign in</a>
+                    </div>
+                    <br />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

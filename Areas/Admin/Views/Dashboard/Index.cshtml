@@ -1,0 +1,175 @@
+﻿@model IEnumerable<MusicStore.Models.Product>
+@{
+    ViewBag.Title = "Admin Dashboard";
+}
+
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Overview</h1>
+</div>
+
+<div class="row">
+
+    <!-- Total Revenue Card -->
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Revenue</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">$@string.Format("{0:N2}", ViewBag.TotalRevenue)</div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Categories Card -->
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Quantity of Categories</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.TotalCategories</div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Products Card -->
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Quantity of Products</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.TotalProducts</div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <!-- Pending Orders -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending Orders</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.PendingOrders</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clock fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shipping Orders -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Shipping Orders</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.ShippingOrders</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-truck fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delivered Orders -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Delivered Orders</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.DeliveredOrders</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancelled Orders -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-danger shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Cancelled Orders</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.CancelledOrders</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-times-circle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-danger"><i class="fas fa-exclamation-triangle"></i> Low Stock Alert (Under 5 items)</h6>
+    </div>
+    <div class="card-body p-0">
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle mb-0" width="100%" cellspacing="0">
+                    <thead class="bg-light text-dark">
+                        <tr>
+                            <th class="pl-4" style="width: 15%;">Product ID</th>
+                            <th>Product Name</th>
+                            <th style="width: 25%;">Stock Quantity</th>
+                            <th class="text-center" style="width: 20%;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var prod in Model)
+                        {
+                            <tr>
+                                <td class="pl-4 text-muted">#@prod.ProductId</td>
+                                <td class="font-weight-bold text-dark">@prod.ProductName</td>
+                                <td class="text-danger font-weight-bold">@prod.StockQuantity items remaining</td>
+                                <td class="text-center">
+                                    <a href="@Url.Action("Edit", "ProductsAdmin", new { id = prod.ProductId })" class="btn btn-sm btn-danger btn-icon-split">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-edit"></i>
+                                        </span>
+                                        <span class="text">Update Stock</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="p-5 text-center text-muted">
+                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                <p class="mb-0 font-weight-bold">All products have sufficient stock levels.</p>
+            </div>
+        }
+    </div>
+</div>

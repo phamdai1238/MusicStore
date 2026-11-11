@@ -1,0 +1,173 @@
+﻿@model MusicStore.Models.Product
+
+@{
+    ViewBag.Title = Model.ProductName;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container my-3 py-3 px-5 animate-fade-in">
+    <div class="mb-4">
+        <a href="@Url.Action("Index", "Home")" class="text-decoration-none text-muted small d-flex align-items-center gap-1">
+            <i class="bi bi-arrow-left"></i> Return to Shop
+        </a>
+    </div>
+
+    <div class="row align-items-center g-5">
+        <div class="col-lg-6 d-flex justify-content-center align-items-center">
+            <div class="details-product-img shadow">
+                <img src="@Url.Content("~/Images/" + Model.ImageUrl)"
+                     alt="@Model.ProductName"
+                     class="w-100 h-100 object-cover" />
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="product-info-header">
+                <div class="product-brandname mb-1">
+                    <p class="text-muted lh-lg m-0">
+                        @Model.BrandName
+                    </p>
+                </div>
+
+                <h1 class="fw-bold text-dark mb-2 tracking-tight fs-2">@Model.ProductName</h1>
+
+                <div class="fs-3 fw-bold text-dark mb-3">$@string.Format("{0:N2}", Model.UnitPrice)</div>
+
+                <div class="product-description mb-4">
+                    <p class="text-muted small lh-lg m-0">
+                        @Model.ProductDescription
+                    </p>
+                </div>
+
+                <div class="mb-4">
+                    @if (Model.StockQuantity > 0)
+                    {
+                        <span class="badge ps-0 bg-success-subtle text-success rounded-pill py-1.5 small">
+                            <i class="bi bi-check-circle-fill me-1"></i> In Stock (@Model.StockQuantity available)
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger-subtle text-danger rounded-pill py-1.5 small">
+                            <i class="bi bi-x-circle-fill me-1"></i> Out of Stock
+                        </span>
+                    }
+                </div>
+            </div>
+
+            <div class="product-quantity-block mb-4">
+                <label class="form-label small fw-medium d-block mb-2">Quantity</label>
+                <div class="input-group quantity-selector-group bg-white border rounded-pill overflow-hidden p-1">
+                    <button class="btn btn-quantity-minus border-0 bg-transparent text-secondary" type="button">
+                        <i class="bi bi-dash"></i>
+                    </button>
+                    <input type="number" id="txtQuantity" class="form-control border-0 text-center fw-semibold text-dark p-0 input-quantity" value="1" min="1" max="@Model.StockQuantity" readonly style="box-shadow:none; font-size:15px;">
+                    <button class="btn btn-quantity-plus border-0 bg-transparent text-secondary" type="button">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="product-actions-group">
+                @if (Model.StockQuantity > 0)
+                {
+                    <div class="d-flex align-items-center gap-3">
+                        <button class="btn shadow product-btn d-flex align-items-center justify-content-center gap-2 btn-add-cart-detail flex-grow-1 py-2.5" data-id="@Model.ProductId" style="border-radius: 50px; background-color: #f3a016; border-color: #f3a016; color: white;">
+                            <i class="bi bi-cart3"></i> Add to Cart
+                        </button>
+
+                        <button class="btn shadow flex-grow-1 py-2.5 btn-buy-now" style="border-radius: 50px; border-color: #e2e8f0; color: #475569;">
+                            Buy Now
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    <button class="btn btn-secondary w-100 py-3 fw-semibold cursor-not-allowed" disabled style="border-radius: 50px;">
+                        Temporarily Out of Stock
+                    </button>
+                }
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            var maxStock = parseInt($('#txtQuantity').attr('max')) || 1;
+
+            $('.btn-quantity-minus').on('click', function () {
+                var currentVal = parseInt($('#txtQuantity').val()) || 1;
+                if (currentVal > 1) {
+                    $('#txtQuantity').val(currentVal - 1);
+                }
+            });
+
+            $('.btn-quantity-plus').on('click', function () {
+                var currentVal = parseInt($('#txtQuantity').val()) || 1;
+                if (currentVal < maxStock) {
+                    $('#txtQuantity').val(currentVal + 1);
+                } else {
+                    alert("Hệ thống chỉ còn " + maxStock + " sản phẩm này trong kho.");
+                }
+            });
+
+            $('.btn-add-cart-detail').on('click', function (e) {
+                e.preventDefault();
+
+                var productId = $(this).data('id');
+                var quantity = parseInt($('#txtQuantity').val()) || 1;
+                var $button = $(this);
+
+                $button.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Adding...');
+
+                $.ajax({
+                    url: '@Url.Action("AddToCart", "ShoppingCarts")',
+                    type: 'POST',
+                    data: { id: productId, qty: quantity },
+                    success: function (response) {
+                        if (response.success) {
+                            $('#cartBadge').text(response.cartCount);
+                            alert("Đã thêm thành công " + quantity + " sản phẩm vào giỏ hàng!");
+                        } else {
+                            alert(response.message || "Có lỗi phát sinh khi đưa sản phẩm vào giỏ hàng.");
+                        }
+                    },
+                    error: function () {
+                        alert("Không thể thiết lập kết nối đến máy chủ giỏ hàng.");
+                    },
+                    complete: function () {
+                        $button.prop('disabled', false).html('<i class="bi bi-cart3"></i> Add to Cart');
+                    }
+                });
+            });
+
+            $('.btn-buy-now').on('click', function () {
+                var productId = $('.btn-add-cart-detail').data('id');
+                var quantity = parseInt($('#txtQuantity').val()) || 1;
+
+                $.ajax({
+                    url: '@Url.Action("AddToCart", "ShoppingCarts")',
+                    type: 'POST',
+                    data: { id: productId, qty: quantity },
+                    success: function (response) {
+                        if (response.success) {
+                            $('#cartBadge').text(response.cartCount);
+                            window.location.href = '@Url.Action("Index", "ShoppingCarts")';
+                        } else {
+                            alert(response.message || "Có lỗi phát sinh khi đưa sản phẩm vào giỏ hàng.");
+                        }
+                    },
+                    error: function () {
+                        alert("Không thể thiết lập kết nối đến máy chủ giỏ hàng.");
+                    },
+                    complete: function () {
+                        $button.prop('disabled', false).html('<i class="bi bi-cart3"></i> Add to Cart');
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,48 @@
+﻿@{
+    ViewBag.Title = "Sign in";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container my-5" style="padding:80px 0 80px 0;">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow border-0">
+                <div class="card-body p-4">
+                    <h2 class="text-center mb-4 fw-bold text-primary">SIGN IN</h2>
+
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success small py-2">@TempData["SuccessMessage"]</div>
+                    }
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger small py-2">@ViewBag.Error</div>
+                    }
+
+                    @using (Html.BeginForm("Login", "Users", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">User name</label>
+                            <input type="text" name="username" class="form-control" placeholder="Enter your username..." required />
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Password</label>
+                            <input type="password" name="password" class="form-control" placeholder="Enter your password..." required />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold text-uppercase">Sign in</button>
+                    }
+
+                    <div class="text-center mt-3 small">
+                        Don't have an account? <a href="@Url.Action("Register", "Users")" class="text-decoration-none">Sign up</a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,90 @@
+﻿@model IEnumerable<MusicStore.Models.Product>
+
+@{
+    ViewBag.Title = "All Products";
+}
+
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container" style="width:fit-content;margin:0 auto">
+        <ul class="navbar-nav fw-bold fs-5">
+            <li class="nav-item">
+                @Html.ActionLink("All Products", "Index", "Products", null, new { @class = "nav-link" })
+            </li>
+            @{ Html.RenderAction("CategoryMenu", "Products"); }
+        </ul>
+    </div>
+</nav>
+
+<div class="row g-4">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="card product-card h-100 card-bloom position-relative" style="cursor: pointer;">
+
+                <div class="bloom-img-wrapper" onclick="location.href='@Url.Action("Details", "Products", new { id = item.ProductId })'">
+                    <img src="@Url.Content("~/Images/" + item.ImageUrl)"
+                         class="card-img-top product-img"
+                         alt="@item.ProductName" />
+                </div>
+
+                <div class="card-body d-flex flex-column">
+                    <h5 class="product-name" onclick="location.href='@Url.Action("Details", "Products", new { id = item.ProductId })'">
+                        @item.ProductName
+                    </h5>
+
+                    <p class="product-price">
+                        $@item.UnitPrice
+                    </p>
+
+                    <button type="button"
+                            data-id="@item.ProductId"
+                            class="btn btn-warning product-btn mt-auto btn-add-to-cart-ajax">
+                        <i class="bi bi-cart3 me-2"></i>
+                        Add to Cart
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            $('.btn-add-to-cart-ajax').on('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                var productId = $(this).data('id');
+                var $button = $(this);
+
+                $button.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Adding...');
+
+                $.ajax({
+                    url: '@Url.Action("AddToCart", "ShoppingCarts")',
+                    type: 'POST',
+                    data: { id: productId },
+                    success: function (response) {
+                        if (response.success) {
+                            $('#cartBadge').text(response.cartCount);
+
+                            alert("Đã thêm 1 sản phẩm vào giỏ hàng!");
+                        } else {
+                            alert(response.message || "Có lỗi xảy ra khi thêm vào giỏ hàng.");
+
+                            if (response.isNotLoggedIn) {
+                                window.location.href = '@Url.Action("Login", "Users")';
+                            }
+                        }
+                    },
+                    error: function () {
+                        alert("Không thể kết nối đến hệ thống giỏ hàng.");
+                    },
+                    complete: function () {
+                        $button.prop('disabled', false).html('<i class="bi bi-cart3 me-2"></i>Add to Cart');
+                    }
+                });
+            });
+        });
+    </script>
+}

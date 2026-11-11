@@ -1,0 +1,129 @@
+﻿@model MusicStore.Models.Order
+@{
+    ViewBag.Title = "Order Details #" + Model.OrderId;
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid px-4 py-4">
+    <div class="mb-4">
+        <a href="@Url.Action("Index", "OrdersAdmin")" class="text-decoration-none text-secondary">⬅️ Back to List</a>
+        <h2 class="fw-bold mt-2">Order Details #@Model.OrderId</h2>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- LEFT PANEL: PURCHASED ITEMS LIST -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold text-secondary">Purchased Products</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Product Details</th>
+                                    <th class="text-end">Unit Price</th>
+                                    <th class="text-center">Quantity</th>
+                                    <th class="text-end pe-4">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var detail in Model.OrderDetails)
+                                {
+                                    decimal subTotal = detail.OrderItemQuantity * detail.OrderItemUnitPrice;
+                                    <tr>
+                                        <td class="ps-4">
+                                            <span class="fw-bold d-block text-dark">@detail.Product.ProductName</span>
+                                            <small class="text-muted">Product ID: #@detail.ProductId</small>
+                                        </td>
+                                        <td class="text-end">$@string.Format("{0:N2}", detail.OrderItemUnitPrice)</td>
+                                        <td class="text-center">@detail.OrderItemQuantity</td>
+                                        <td class="text-end fw-bold text-dark pe-4">$@string.Format("{0:N2}", subTotal)</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-light py-3 text-end pe-4">
+                    <span class="fs-5 text-muted me-2">Grand Total:</span>
+                    <span class="fs-4 fw-bold text-danger">$@string.Format("{0:N2}", Model.OrderTotalAmount)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL: CUSTOMER INFO & STATUS PROCESS -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold text-secondary">Customer & Shipping</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>Account Username:</strong> @(Model.User != null ? Model.User.FullName : "N/A")</p>
+                    <p class="mb-2"><strong>Contact Email:</strong> @(Model.User != null ? Model.User.EmailAddress : "N/A")</p>
+                    <p class="mb-2"><strong>Order Date:</strong> @(Model.OrderDate.HasValue ? Model.OrderDate.Value.ToString("MM/dd/yyyy HH:mm") : "N/A")</p>
+                    <p class="mb-0"><strong>Shipping Address:</strong></p>
+                    <div class="p-2 bg-light rounded mt-1 border text-muted" style="font-size: 0.95rem;">
+                        @Model.ShippingAddress
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process Status Card -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold text-secondary">Process Status</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">Current Status:</p>
+                    <div class="mb-3">
+                        @if (Model.OrderStatus == "Pending")
+                        {
+                            <span class="badge bg-warning text-white px-3 py-2 fs-6">Pending</span>
+                        }
+                        else if (Model.OrderStatus == "Shipping")
+                        {
+                            <span class="badge bg-primary text-white px-3 py-2 fs-6">Shipping</span>
+                        }
+                        else if (Model.OrderStatus == "Delivered")
+                        {
+                            <span class="badge bg-success text-white px-3 py-2 fs-6">Delivered</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary text-white px-3 py-2 fs-6">Cancelled</span>
+                        }
+                    </div>
+
+                    <hr />
+
+                    @using (Html.BeginForm("UpdateStatus", "OrdersAdmin", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="orderId" value="@Model.OrderId" />
+
+                        <div class="mb-3">
+                            <label for="newStatus" class="form-label fw-bold">Change status to:</label>
+                            <select name="newStatus" id="newStatus" class="form-select">
+                                <option value="Pending" @(Model.OrderStatus == "Pending" ? "selected" : "")>Pending</option>
+                                <option value="Shipping" @(Model.OrderStatus == "Shipping" ? "selected" : "")>Shipping</option>
+                                <option value="Delivered" @(Model.OrderStatus == "Delivered" ? "selected" : "")>Delivered</option>
+                                <option value="Cancelled" @(Model.OrderStatus == "Cancelled" ? "selected" : "")>Cancelled</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Save Changes</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

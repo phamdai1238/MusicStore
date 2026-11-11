@@ -1,0 +1,14 @@
+﻿@model IEnumerable<MusicStore.Models.Category>
+
+@foreach (var i in Model)
+{
+    var url = Url.Action("ProductsByCategory", "ProductsAdmin", new { id = i.CategoryId });
+
+    <li class="nav-item">
+        <h2 class="mb-0 fs-4 fw-bolder">
+            <a href="@url" class="nav-link">
+                @i.CategoryName
+            </a>
+        </h2>
+    </li>
+}

@@ -1,0 +1,85 @@
+﻿@model MusicStore.Models.Order
+@{
+    ViewBag.Title = "Order Details #" + Model.OrderId;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var details = ViewBag.OrderDetails as IEnumerable<MusicStore.Models.OrderDetail>;
+}
+
+<div class="container my-5 animate-fade-in">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark"><i class="bi bi-receipt text-warning me-2"></i>Order Details #@Model.OrderId</h2>
+        <a href="@Url.Action("MyOrders")" class="btn btn-outline-secondary btn-sm rounded-pill">
+            <i class="bi bi-arrow-left"></i> &nbsp; Back to Order history
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-light border-start border-4 border-warning">
+                <h5 class="fw-bold mb-3 text-secondary">Order Information</h5>
+                <p class="mb-2"><strong>Date Ordered:</strong> @(Model.OrderDate.HasValue ? Model.OrderDate.Value.ToString("dd/MM/yyyy HH:mm") : "N/A")</p>
+                <p class="mb-2"><strong>Delivery Address:</strong> @Model.ShippingAddress</p>
+                <div class="mt-2">
+                    <strong>Status: </strong>
+                    @if (Model.OrderStatus == "Pending")
+                    {
+                        <span class="badge bg-warning text-dark px-2.5 py-1.5 rounded-3">Pending</span>
+                    }
+                    else if (Model.OrderStatus == "Shipping")
+                    {
+                        <span class="badge bg-primary px-2.5 py-1.5 rounded-3">Shipping</span>
+                    }
+                    else if (Model.OrderStatus == "Delivered")
+                    {
+                        <span class="badge bg-success px-2.5 py-1.5 rounded-3">Delivered</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary px-2.5 py-1.5 rounded-3">Cancelled</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0 table-hover">
+                        <thead class="table-dark small text-uppercase">
+                            <tr>
+                                <th class="ps-4 py-3">Product</th>
+                                <th class="text-center py-3">Unit Price</th>
+                                <th class="text-center py-3">Quantity</th>
+                                <th class="text-end pe-4 py-3">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (details != null)
+                            {
+                                foreach (var item in details)
+                                {
+                                    <tr>
+                                        <td class="ps-4">
+                                            <div class="fw-semibold text-dark">@item.Product.ProductName</div>
+                                        </td>
+                                        <td class="text-center text-muted">$@string.Format("{0:N2}", item.OrderItemUnitPrice)</td>
+                                        <td class="text-center fw-bold">@item.OrderItemQuantity</td>
+                                        <td class="text-end fw-bold text-dark pe-4">
+                                            $@string.Format("{0:N2}", item.OrderItemQuantity * item.OrderItemUnitPrice)
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                        <tfoot class="table-light border-top">
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold py-3 fs-5">Total Payment:</td>
+                                <td class="text-end fw-bold text-danger fs-4 py-3 pe-4">$@string.Format("{0:N2}", Model.OrderTotalAmount)</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

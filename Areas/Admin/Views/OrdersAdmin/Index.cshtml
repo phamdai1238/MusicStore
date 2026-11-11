@@ -1,0 +1,90 @@
+﻿@model IEnumerable<MusicStore.Models.Order>
+@{
+    ViewBag.Title = "Order Management";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    string currentStatus = ViewBag.CurrentStatus ?? "";
+}
+
+<div class="container-fluid px-4 py-4">
+    <h2 class="mb-4 fw-bold">Order Management</h2>
+
+    <!-- Order Status Filters -->
+    <div class="mb-4">
+        <div class="btn-group" role="group">
+            <a href="@Url.Action("Index", "OrdersAdmin", new { status = "" })"
+               class="btn @(currentStatus == "" ? "btn-dark" : "btn-outline-dark")">All (@Model.Count())</a>
+
+            <a href="@Url.Action("Index", "OrdersAdmin", new { status = "Pending" })"
+               class="btn @(currentStatus == "Pending" ? "btn-warning" : "btn-outline-warning")">Pending</a>
+
+            <a href="@Url.Action("Index", "OrdersAdmin", new { status = "Shipping" })"
+               class="btn @(currentStatus == "Shipping" ? "btn-primary" : "btn-outline-primary")">Shipping</a>
+
+            <a href="@Url.Action("Index", "OrdersAdmin", new { status = "Delivered" })"
+               class="btn @(currentStatus == "Delivered" ? "btn-success" : "btn-outline-success")">Delivered</a>
+
+            <a href="@Url.Action("Index", "OrdersAdmin", new { status = "Cancelled" })"
+               class="btn @(currentStatus == "Cancelled" ? "btn-danger" : "btn-outline-danger")">Cancelled</a>
+        </div>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Order ID</th>
+                            <th>Customer</th>
+                            <th>Order Date</th>
+                            <th>Shipping Address</th>
+                            <th>Total Amount</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in Model)
+                        {
+                            <tr onclick="location.href='@Url.Action("Details", "OrdersAdmin", new { id = order.OrderId })'" style="cursor: pointer;">
+                                <td class="ps-4 fw-bold text-primary">#@order.OrderId</td>
+                                <td>@(order.User != null ? order.User.FullName : "Guest Account")</td>
+                                <td>@(order.OrderDate.HasValue ? order.OrderDate.Value.ToString("MM/dd/yyyy HH:mm") : "N/A")</td>
+                                <td>
+                                    <span class="text-truncate d-block" style="max-width: 220px;" title="@order.ShippingAddress">
+                                        @order.ShippingAddress
+                                    </span>
+                                </td>
+                                <td class="fw-bold text-danger">$@string.Format("{0:N2}", order.OrderTotalAmount)</td>
+                                <td class="text-center">
+                                    @if (order.OrderStatus == "Pending")
+                                    {
+                                        <span class="badge bg-warning-subtle text-warning border border-warning px-3 py-2 rounded-pill">Pending</span>
+                                    }
+                                    else if (order.OrderStatus == "Shipping")
+                                    {
+                                        <span class="badge bg-primary-subtle text-primary border border-primary px-3 py-2 rounded-pill">Shipping</span>
+                                    }
+                                    else if (order.OrderStatus == "Delivered")
+                                    {
+                                        <span class="badge bg-success-subtle text-success border border-success px-3 py-2 rounded-pill">Delivered</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary-subtle text-secondary border border-secondary px-3 py-2 rounded-pill">Cancelled</span>
+                                    }
+                                </td>
+                                <td class="text-center" onclick="event.stopPropagation();">
+                                    <a href="@Url.Action("Details", "OrdersAdmin", new { id = order.OrderId })" class="btn btn-sm btn-outline-secondary">
+                                        View & Process
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

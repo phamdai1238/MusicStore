@@ -1,0 +1,46 @@
+﻿@model IEnumerable<MusicStore.Models.Product>
+
+@{
+    ViewBag.Title = "ProductsByCategory";
+}
+
+<nav class="navbar navbar-expand-sm navbar-light bg-light">
+    <div class="container justify-content-center">
+        <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+            <ul class="navbar-nav mx-auto text-center align-items-center">
+                <li class="nav-item">
+                    <h2 class="mb-0 fs-4 fw-bolder">
+                        @Html.ActionLink("All Products", "Index", "ProductsAdmin", null, new { @class = "nav-link" })
+                    </h2>
+                </li>
+
+                @{ Html.RenderAction("CategoryMenu", "ProductsAdmin"); }
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<h2>List of @ViewBag.CategoryName</h2>
+
+<p>
+    @Html.ActionLink("Create New Product", "Create")
+</p>
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-sm-6 col-md-4 col-lg-3 table-bordered text-center" style="padding: 15px;">
+            Category: <b>@Html.DisplayFor(modelItem => item.Category.CategoryName)</b> <br />
+            <img src="@Url.Content("~/Images/" + item.ImageUrl)" width="100" height="100" alt="@item.ProductName" /> <br />
+            Brand: <b>@Html.DisplayFor(modelItem => item.BrandName)</b> <br />
+            Product Name: <b>@Html.DisplayFor(modelItem => item.ProductName)</b> <br />
+            Description: <b>@Html.DisplayFor(modelItem => item.ProductDescription)</b> <br />
+            Price: <b>$@Html.DisplayFor(modelItem => item.UnitPrice)</b> <br />
+            Stock: <b>@Html.DisplayFor(modelItem => item.StockQuantity)</b> <br />
+
+            @Html.ActionLink("Edit", "Edit", new { id = item.ProductId }) |
+            @Html.ActionLink("Details", "Details", new { id = item.ProductId }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.ProductId })
+        </div>
+    }
+</div>
